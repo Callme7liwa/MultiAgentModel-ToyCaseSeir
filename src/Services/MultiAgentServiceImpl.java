@@ -2,6 +2,7 @@ package Services;
 
 import Models.Individual;
 import Models.Status;
+import Utils.CustomRandom;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,33 +13,26 @@ import java.util.Random;
 
 public class MultiAgentServiceImpl implements MultiAgentService {
 
-    private static final String OUTPUT_FILE = "results.csv";
+    private static final String OUTPUT_FILE = "results_2.csv";
+    private static Random random = new Random(123); // 123 est la seed (remplacez par la valeur souhaitée)
 
     private  List<Individual> individuals;
     private  char[][] grid;
-    private  Random random = new Random();
+    private  CustomRandom customRandom;
 
     public MultiAgentServiceImpl(){
         this.individuals = new ArrayList<>();;
         this.grid = new char[GRID_SIZE][GRID_SIZE];
-        this.random = new Random();
-    }
-
-    private  int getRandomDuration(int maxDuration) {
-        return random.nextInt(maxDuration) + 1;
+        this.customRandom = CustomRandom.getInstance();
     }
 
     // Initialiser les individus
     public void initialize_individuals() {
-
         for (int i = 0; i < TOTAL_INDIVIDUALS; i++) {
             int x = random.nextInt(GRID_SIZE);
             int y = random.nextInt(GRID_SIZE);
             Status status = (i < INITIAL_INFECTED) ? Status.I : Status.S;
-            int de = (status == Status.E) ? getRandomDuration(EXPOSED_DURATION) : 0;
-            int dl = (status == Status.I) ? getRandomDuration(INFECTED_DURATION) : 0;
-            int dr = (status == Status.R) ? getRandomDuration(RECOVERED_DURATION) : 0;
-            individuals.add(new Individual(x, y, status, de, dl, dr));
+            individuals.add(new Individual(x, y, status));
         }
     }
 
@@ -55,8 +49,8 @@ public class MultiAgentServiceImpl implements MultiAgentService {
         for (Individual individual : individuals) {
             int x = individual.getX();
             int y = individual.getY();
-            char status = (individual.getStatus() == Status.I) ? 'I' :
-                    (individual.getStatus() == Status.E) ? 'E' :
+            char status =   (individual.getStatus() == Status.I) ? 'I' :
+                            (individual.getStatus() == Status.E) ? 'E' :
                             (individual.getStatus() == Status.R) ? 'R' : 'S';
             grid[x][y] = status;
         }
@@ -95,10 +89,9 @@ public class MultiAgentServiceImpl implements MultiAgentService {
                 }
             }
 
-            double probability = 1 - Math.pow(1 - INFECTION_PROBABILITY, voisinsInfectieux);
+            double probability = 1 - Math.exp(-0.5 * voisinsInfectieux);
             if (random.nextDouble() < probability) {
                 individual.setStatus(Status.E);
-                individual.setDe(getRandomDuration(EXPOSED_DURATION));
             }
         }
     }
@@ -110,13 +103,11 @@ public class MultiAgentServiceImpl implements MultiAgentService {
                 individual.setDe(individual.getDe() - 1);
                 if (individual.getDe() == 0) {
                     individual.setStatus(Status.I);
-                    individual.setDl(getRandomDuration(INFECTED_DURATION));
                 }
             } else if (individual.getStatus() == Status.I) {
                 individual.setDl(individual.getDl() - 1);
                 if (individual.getDl() == 0) {
                     individual.setStatus(Status.R);
-                    individual.setDr(getRandomDuration(RECOVERED_DURATION));
                 }
             } else if (individual.getStatus() == Status.R) {
                 individual.setDr(individual.getDr() - 1);

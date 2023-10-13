@@ -1,5 +1,10 @@
 package Models;
 
+import Utils.CustomRandom;
+import Utils.UtilsAttributs;
+
+import java.util.function.Function;
+
 public class Individual {
     int x;
     int y;
@@ -65,14 +70,15 @@ public class Individual {
         this.dr = dr;
     }
 
-    public Individual(int x, int y, Status status, int de, int dl, int dr) {
+    public Individual(int x, int y, Status status) {
+        CustomRandom random = CustomRandom.getInstance();
         this.x = x;
         this.y = y;
         this.status = status;
         this.timeInStatus = 0;
-        this.de = de;
-        this.dl = dl;
-        this.dr = dr;
+        this.de = (int) random.negExp(UtilsAttributs.EXPOSED_DURATION);
+        this.dl = (int) random.negExp(UtilsAttributs.INFECTED_DURATION);
+        this.dr = (int) random.negExp(UtilsAttributs.RECOVERED_DURATION);
     }
 
     public void evoluer() {
