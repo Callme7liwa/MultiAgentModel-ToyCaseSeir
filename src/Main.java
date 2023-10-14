@@ -3,7 +3,7 @@ import Services.MultiAgentServiceImpl;
 
 public class Main {
     public static  void main(String args[]){
-        MultiAgentService multiAgentService = new MultiAgentServiceImpl();
+        MultiAgentService multiAgentService = MultiAgentServiceImpl.getInstance();
         multiAgentService.start();
     }
 }

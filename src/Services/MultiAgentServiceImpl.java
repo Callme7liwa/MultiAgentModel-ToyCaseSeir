@@ -2,76 +2,86 @@ package Services;
 
 import Models.Individual;
 import Models.Status;
+import Utils.Coordonnees;
 import Utils.CustomRandom;
+import Utils.UtilsAttributs;
 
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class MultiAgentServiceImpl implements MultiAgentService {
-
-    private static final String OUTPUT_FILE = "results_2.csv";
-    private static Random random = new Random(123); // 123 est la seed (remplacez par la valeur souhaitée)
 
     private  List<Individual> individuals;
     private  char[][] grid;
     private  CustomRandom customRandom;
+    private  static MultiAgentServiceImpl  agentServiceImpl;
 
     public MultiAgentServiceImpl(){
         this.individuals = new ArrayList<>();;
-        this.grid = new char[GRID_SIZE][GRID_SIZE];
+        this.grid = new char[UtilsAttributs.GRID_SIZE][UtilsAttributs.GRID_SIZE];
         this.customRandom = CustomRandom.getInstance();
+    }
+
+    public static MultiAgentServiceImpl getInstance(){
+        if(agentServiceImpl == null)
+            agentServiceImpl = new MultiAgentServiceImpl();
+        return agentServiceImpl;
     }
 
     // Initialiser les individus
     public void initialize_individuals() {
-        for (int i = 0; i < TOTAL_INDIVIDUALS; i++) {
-            int x = random.nextInt(GRID_SIZE);
-            int y = random.nextInt(GRID_SIZE);
-            Status status = (i < INITIAL_INFECTED) ? Status.I : Status.S;
-            individuals.add(new Individual(x, y, status));
+        for (int i = 0; i < UtilsAttributs.TOTAL_INDIVIDUALS; i++) {
+            int x = customRandom.generateInt(UtilsAttributs.GRID_SIZE);
+            int y = customRandom.generateInt(UtilsAttributs.GRID_SIZE);
+            Coordonnees coordonnees = new Coordonnees(x,y);
+            Status status = (i < UtilsAttributs.INITIAL_INFECTED) ? Status.I : Status.S;
+            int dI = (int) customRandom.negExp(UtilsAttributs.INFECTED_DURATION);
+            int dE = (int) customRandom.negExp(UtilsAttributs.EXPOSED_DURATION);
+            int dR = (int) customRandom.negExp(UtilsAttributs.RECOVERED_DURATION);
+            individuals.add(new Individual(coordonnees, status, dI, dE, dR));
         }
     }
 
     // Méthode pour initialiser la grille
     public  void initializeGrid() {
         // Initialisation de la grille avec l'état initial "S" (sain) pour toutes les cellules
-        for (int i = 0; i < GRID_SIZE; i++) {
-            for (int j = 0; j < GRID_SIZE; j++) {
+        for (int i = 0; i < UtilsAttributs.GRID_SIZE; i++) {
+            for (int j = 0; j < UtilsAttributs.GRID_SIZE; j++) {
                 grid[i][j] = 'S';
             }
         }
-
         // Placement des individus dans la grille selon leur état initial
         for (Individual individual : individuals) {
-            int x = individual.getX();
-            int y = individual.getY();
-            char status =   (individual.getStatus() == Status.I) ? 'I' :
-                            (individual.getStatus() == Status.E) ? 'E' :
-                            (individual.getStatus() == Status.R) ? 'R' : 'S';
+            int x = individual.getCoordonnees().getX();
+            int y = individual.getCoordonnees().getY();
+            char status =   (individual.getStatus() == Status.I) ? 'I' : 'S';
             grid[x][y] = status;
         }
     }
 
     // Méthode pour gérer le déplacement aléatoire
     public  void deplacer(Individual individual) {
-        int newX, newY;
-
+        Coordonnees coordinates ;
+        boolean positionOccupied;
+        int m=0 ;
         do {
-            newX = (individual.getX() + random.nextInt(3) - 1 + 300) % 300; // Déplacement aléatoire dans la grille toroïdale
-            newY = (individual.getY() + random.nextInt(3) - 1 + 300) % 300;
-        } while (newX == individual.getX() && newY == individual.getY()); // Assurez-vous que l'individu se déplace réellement
+            int newX = (individual.getCoordonnees().getX() + customRandom.generateInt(3) - 1 + 300) % 300; // Déplacement aléatoire dans la grille toroïdale
+            int newY = (individual.getCoordonnees().getY() + customRandom.generateInt(3) - 1 + 300) % 300;
+            coordinates = new Coordonnees(newX, newY);
+            positionOccupied = individuals.stream().anyMatch(i -> i.getCoordonnees().getX() == newX && i.getCoordonnees().getY() == newY);
+        }
+        while (positionOccupied || (coordinates.getX() == individual.getCoordonnees().getX() && coordinates.getY() == individual.getCoordonnees().getY())); // Assurez-vous que l'individu se déplace réellement
 
-        grid[individual.getX()][individual.getY()] = 'S'; // Videz l'ancienne case
-        individual.setX(newX);
-        individual.setY(newY);
-        char status = (individual.getStatus() == Status.I) ? 'I' :
-                (individual.getStatus() == Status.E) ? 'E' :
+        grid[individual.getCoordonnees().getX()][individual.getCoordonnees().getY()] = 'S'; // Videz l'ancienne case
+        individual.setCoordonnees(coordinates);
+        char status =   (individual.getStatus() == Status.I) ? 'I' :
+                        (individual.getStatus() == Status.E) ? 'E' :
                         (individual.getStatus() == Status.R) ? 'R' : 'S';
-        grid[individual.getX()][individual.getY()] = status; // Définir la nouvelle position
+        grid[individual.getCoordonnees().getX()][individual.getCoordonnees().getY()] = status; // Définir la nouvelle position
     }
 
     // Méthode pour gérer l'infection du voisinage
@@ -79,8 +89,8 @@ public class MultiAgentServiceImpl implements MultiAgentService {
         if (individual.getStatus() == Status.S) {
             int voisinsInfectieux = 0;
             // Vérifier le voisinage de Moore
-            for (int i = individual.getX() - 1; i <= individual.getX() + 1; i++) {
-                for (int j = individual.getY() - 1; j <= individual.getY() + 1; j++) {
+            for (int i = individual.getCoordonnees().getX() - 1; i <= individual.getCoordonnees().getX() + 1; i++) {
+                for (int j = individual.getCoordonnees().getY() - 1; j <= individual.getCoordonnees().getY() + 1; j++) {
                     int ni = (i + 300) % 300; // Gérer les bords toroïdaux
                     int nj = (j + 300) % 300;
                     if (grid[ni][nj] == 'I') {
@@ -88,38 +98,44 @@ public class MultiAgentServiceImpl implements MultiAgentService {
                     }
                 }
             }
-
             double probability = 1 - Math.exp(-0.5 * voisinsInfectieux);
-            if (random.nextDouble() < probability) {
+            double valueGenerated=customRandom.generateRandomDoubleValue();
+            if ( valueGenerated < probability) {
                 individual.setStatus(Status.E);
             }
         }
     }
 
     // Méthode pour mettre à jour l'état de chaque individu
-    public  void updateIndividuals() {
+    /*public void updateIndividuals() {
         for (Individual individual : individuals) {
             if (individual.getStatus() == Status.E) {
-                individual.setDe(individual.getDe() - 1);
-                if (individual.getDe() == 0) {
-                    individual.setStatus(Status.I);
+                if (individual.getDe() > 0) {
+                    individual.setDe(individual.getDe() - 1);
+                    if (individual.getDe() == 0) {
+                        individual.setStatus(Status.I);
+                    }
                 }
             } else if (individual.getStatus() == Status.I) {
-                individual.setDl(individual.getDl() - 1);
-                if (individual.getDl() == 0) {
-                    individual.setStatus(Status.R);
+                if (individual.getDI() > 0) {
+                    individual.setDI(individual.getDI() - 1);
+                    if (individual.getDI() == 0) {
+                        individual.setStatus(Status.R);
+                    }
                 }
             } else if (individual.getStatus() == Status.R) {
-                individual.setDr(individual.getDr() - 1);
-                if (individual.getDr() == 0) {
-                    individual.setStatus(Status.S);
+                if (individual.getDr() > 0) {
+                    individual.setDr(individual.getDr() - 1);
+                    if (individual.getDr() == 0) {
+                        individual.setStatus(Status.S);
+                    }
                 }
             }
         }
-    }
+    }*/
 
     // Méthode pour exécuter une itération de la simulation
-    public void simulateIteration(int iteration) {
+    public void simulateIteration(int simulation,int iteration,String fileName) {
         // Déplacer tous les individus
         for (Individual individual : individuals) {
             deplacer(individual);
@@ -131,10 +147,11 @@ public class MultiAgentServiceImpl implements MultiAgentService {
         }
 
         // Mettre à jour l'état de chaque individu
-        updateIndividuals();
-
+        for (Individual individual : individuals) {
+            individual.evoluer();
+        }
         // Enregistrer les statistiques
-        try (PrintWriter writer = new PrintWriter(new FileWriter(OUTPUT_FILE, true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
             int totalExposed = 0;
             int totalInfected = 0;
             int totalRecovered = 0;
@@ -148,24 +165,31 @@ public class MultiAgentServiceImpl implements MultiAgentService {
                     totalRecovered++;
                 }else totalSuceptible++;
             }
-            writer.println(iteration + "," + totalSuceptible + "," + totalExposed + "," + totalInfected + "," + totalRecovered);
+            writer.write(iteration + "," + totalSuceptible + "," + totalExposed + "," + totalInfected + "," + totalRecovered);
+            writer.newLine();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void simulate(int simulation){
+        String fileName = UtilsAttributs.OUTPUT_FILE_PREFIX+simulation+".csv";
+        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
+            writer.println("iteration,susceptible,exposed,infected,recovered");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for(int iteration=1 ; iteration< UtilsAttributs.TOTAL_ITERATIONS ; iteration++){
+            simulateIteration(simulation , iteration,fileName);
         }
     }
 
     public void start() {
         initialize_individuals();
         initializeGrid();
-
-        try (PrintWriter writer = new PrintWriter(new FileWriter(OUTPUT_FILE))) {
-            writer.println("iteration,susceptible,exposed,infected,recovered");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        for (int iteration = 1; iteration <= TOTAL_ITERATIONS; iteration++) {
-            simulateIteration(iteration);
+        for(int simulation=1 ; simulation <= 1 ; simulation++)
+        {
+            simulate(simulation);
         }
     }
 }

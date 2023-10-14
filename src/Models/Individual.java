@@ -1,41 +1,42 @@
 package Models;
 
+import Utils.Coordonnees;
 import Utils.CustomRandom;
 import Utils.UtilsAttributs;
 
-import java.util.function.Function;
-
 public class Individual {
-    int x;
-    int y;
+    Coordonnees coordonnees;
     Status status;
     int timeInStatus;
-    int de;
-    int dl;
-    int dr;
+    int dE;
+    int dI;
+    int dR;
 
-    public int getX() {
-        return this.x;
+    public Individual(Coordonnees coordonnees, Status status, int dI, int dE, int dR) {
+        this.coordonnees = coordonnees;
+        this.status = status;
+        this.timeInStatus = 0;
+        this.dE = dE;
+        this.dI = dI;
+        this.dR = dR;
     }
 
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return this.y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public Status getStatus() {
         return this.status;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setCoordonnees(Coordonnees coordonnees){
+        this.coordonnees.setX(coordonnees.getX());
+        this.coordonnees.setY(coordonnees.getY());
+    }
+
+    public Coordonnees getCoordonnees()
+    {
+        return this.coordonnees;
     }
 
     public int getTimeInStatus() {
@@ -47,52 +48,42 @@ public class Individual {
     }
 
     public int getDe() {
-        return this.de;
+        return this.dE;
     }
 
-    public void setDe(int de) {
-        this.de = de;
+    public void setDe(int dE) {
+        this.dE = dE;
     }
 
-    public int getDl() {
-        return this.dl;
+    public int getDI() {
+        return this.dI;
     }
 
-    public void setDl(int dl) {
-        this.dl = dl;
+    public void setDI(int dI) {
+        this.dI = dI;
     }
 
     public int getDr() {
-        return this.dr;
+        return this.dR;
     }
 
-    public void setDr(int dr) {
-        this.dr = dr;
-    }
-
-    public Individual(int x, int y, Status status) {
-        CustomRandom random = CustomRandom.getInstance();
-        this.x = x;
-        this.y = y;
-        this.status = status;
-        this.timeInStatus = 0;
-        this.de = (int) random.negExp(UtilsAttributs.EXPOSED_DURATION);
-        this.dl = (int) random.negExp(UtilsAttributs.INFECTED_DURATION);
-        this.dr = (int) random.negExp(UtilsAttributs.RECOVERED_DURATION);
+    public void setDr(int dR) {
+        this.dR = dR;
     }
 
     public void evoluer() {
         timeInStatus++;
-        if (status == Status.E && timeInStatus >= de) {
+        if (status == Status.E && timeInStatus >= dE) {
             status = Status.I; // Passage de E à I
             timeInStatus = 0;
-        } else if (status == Status.I && timeInStatus >= dl) {
+        } else if (status == Status.I && timeInStatus >= dI) {
             status = Status.R; // Passage de I à R
             timeInStatus = 0;
-        } else if (status == Status.R && timeInStatus >= dr) {
+        } else if (status == Status.R && timeInStatus >= dR) {
             status = Status.S; // Passage de R à S
             timeInStatus = 0;
         }
     }
+
 }
 

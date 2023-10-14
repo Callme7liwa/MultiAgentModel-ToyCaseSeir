@@ -16,19 +16,23 @@ public class CustomRandom {
         if (instance == null) {
             synchronized (CustomRandom.class) {
                 if (instance == null) {
-                    instance = new CustomRandom();
+                    instance =new CustomRandom();
                 }
             }
         }
         return instance;
     }
 
-    public  double generateRandomValue() {
+    public int generateInt(int seed){
+        return random.nextInt(seed);
+    }
+
+    public  double generateRandomDoubleValue() {
         return random.nextDouble();
     }
 
     public  double negExp(double inMean) {
-        return -inMean * Math.log(1 - generateRandomValue());
+        return -inMean * Math.log(1 - generateRandomDoubleValue());
     }
 
 }
