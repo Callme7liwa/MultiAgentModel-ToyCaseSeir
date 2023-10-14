@@ -67,14 +67,14 @@ public class MultiAgentServiceImpl implements MultiAgentService {
     public  void deplacer(Individual individual) {
         Coordonnees coordinates ;
         boolean positionOccupied;
-        int m=0 ;
+        System.out.println("Entre");
         do {
             int newX = (individual.getCoordonnees().getX() + customRandom.generateInt(3) - 1 + 300) % 300; // Déplacement aléatoire dans la grille toroïdale
             int newY = (individual.getCoordonnees().getY() + customRandom.generateInt(3) - 1 + 300) % 300;
             coordinates = new Coordonnees(newX, newY);
             positionOccupied = individuals.stream().anyMatch(i -> i.getCoordonnees().getX() == newX && i.getCoordonnees().getY() == newY);
         }while (positionOccupied || (coordinates.getX() == individual.getCoordonnees().getX() && coordinates.getY() == individual.getCoordonnees().getY())); // Assurez-vous que l'individu se déplace réellement
-
+        System.out.println("Sorties");
         grid[individual.getCoordonnees().getX()][individual.getCoordonnees().getY()] = 'S'; // Videz l'ancienne case
         individual.setCoordonnees(coordinates);
         char status =   (individual.getStatus() == Status.I) ? 'I' :
@@ -98,9 +98,9 @@ public class MultiAgentServiceImpl implements MultiAgentService {
                 }
             }
             double probability = 1 - Math.exp(-0.5 * voisinsInfectieux);
-            double valueGenerated=customRandom.generateRandomDoubleValue();
-            if ( valueGenerated < probability) {
+            if ( customRandom.generateRandomDoubleValue() < probability) {
                 individual.setStatus(Status.E);
+                individual.setTimeInStatus(0);
             }
         }
     }
@@ -186,7 +186,7 @@ public class MultiAgentServiceImpl implements MultiAgentService {
     public void start() {
         initialize_individuals();
         initialize_grid();
-        for(int simulation=1 ; simulation <= UtilsAttributs.NUMBER_SIMULATION ; simulation++)
+        for(int simulation=1 ; simulation <= 1 ; simulation++)
         {
             simulate(simulation);
         }

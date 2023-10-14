@@ -1,8 +1,7 @@
 package Models;
 
 import Utils.Coordonnees;
-import Utils.CustomRandom;
-import Utils.UtilsAttributs;
+
 
 public class Individual {
     Coordonnees coordonnees;
