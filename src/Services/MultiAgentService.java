@@ -6,10 +6,10 @@ public interface MultiAgentService {
 
 
     public void initialize_individuals();
-    public void initializeGrid();
+    public void initialize_grid();
     public void deplacer(Individual individual);
-    public void infecterVoisinage(Individual individual);
+    public void infecter_voisinage(Individual individual);
     /*public void updateIndividuals();*/
-    public void simulateIteration(int simulation,int iteration,String fileName);
+    public void simulate_iteration(int simulation,int iteration,String fileName);
     public void start();
 }

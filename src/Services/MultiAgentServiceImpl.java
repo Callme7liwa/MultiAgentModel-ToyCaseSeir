@@ -47,7 +47,7 @@ public class MultiAgentServiceImpl implements MultiAgentService {
     }
 
     // Méthode pour initialiser la grille
-    public  void initializeGrid() {
+    public  void initialize_grid() {
         // Initialisation de la grille avec l'état initial "S" (sain) pour toutes les cellules
         for (int i = 0; i < UtilsAttributs.GRID_SIZE; i++) {
             for (int j = 0; j < UtilsAttributs.GRID_SIZE; j++) {
@@ -73,8 +73,7 @@ public class MultiAgentServiceImpl implements MultiAgentService {
             int newY = (individual.getCoordonnees().getY() + customRandom.generateInt(3) - 1 + 300) % 300;
             coordinates = new Coordonnees(newX, newY);
             positionOccupied = individuals.stream().anyMatch(i -> i.getCoordonnees().getX() == newX && i.getCoordonnees().getY() == newY);
-        }
-        while (positionOccupied || (coordinates.getX() == individual.getCoordonnees().getX() && coordinates.getY() == individual.getCoordonnees().getY())); // Assurez-vous que l'individu se déplace réellement
+        }while (positionOccupied || (coordinates.getX() == individual.getCoordonnees().getX() && coordinates.getY() == individual.getCoordonnees().getY())); // Assurez-vous que l'individu se déplace réellement
 
         grid[individual.getCoordonnees().getX()][individual.getCoordonnees().getY()] = 'S'; // Videz l'ancienne case
         individual.setCoordonnees(coordinates);
@@ -85,7 +84,7 @@ public class MultiAgentServiceImpl implements MultiAgentService {
     }
 
     // Méthode pour gérer l'infection du voisinage
-    public  void infecterVoisinage(Individual individual) {
+    public  void infecter_voisinage(Individual individual) {
         if (individual.getStatus() == Status.S) {
             int voisinsInfectieux = 0;
             // Vérifier le voisinage de Moore
@@ -135,7 +134,7 @@ public class MultiAgentServiceImpl implements MultiAgentService {
     }*/
 
     // Méthode pour exécuter une itération de la simulation
-    public void simulateIteration(int simulation,int iteration,String fileName) {
+    public void simulate_iteration(int simulation,int iteration,String fileName) {
         // Déplacer tous les individus
         for (Individual individual : individuals) {
             deplacer(individual);
@@ -143,7 +142,7 @@ public class MultiAgentServiceImpl implements MultiAgentService {
 
         // Infecter le voisinage de chaque individu
         for (Individual individual : individuals) {
-            infecterVoisinage(individual);
+            infecter_voisinage(individual);
         }
 
         // Mettre à jour l'état de chaque individu
@@ -180,14 +179,14 @@ public class MultiAgentServiceImpl implements MultiAgentService {
             e.printStackTrace();
         }
         for(int iteration=1 ; iteration< UtilsAttributs.TOTAL_ITERATIONS ; iteration++){
-            simulateIteration(simulation , iteration,fileName);
+            simulate_iteration(simulation , iteration,fileName);
         }
     }
 
     public void start() {
         initialize_individuals();
-        initializeGrid();
-        for(int simulation=1 ; simulation <= 1 ; simulation++)
+        initialize_grid();
+        for(int simulation=1 ; simulation <= UtilsAttributs.NUMBER_SIMULATION ; simulation++)
         {
             simulate(simulation);
         }
