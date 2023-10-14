@@ -186,7 +186,7 @@ public class MultiAgentServiceImpl implements MultiAgentService {
     public void start() {
         initialize_individuals();
         initialize_grid();
-        for(int simulation=1 ; simulation <= 1 ; simulation++)
+        for(int simulation=1 ; simulation <= UtilsAttributs.NUMBER_SIMULATION ; simulation++)
         {
             simulate(simulation);
         }
