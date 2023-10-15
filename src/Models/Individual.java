@@ -4,6 +4,7 @@ import Utils.Coordonnees;
 
 
 public class Individual {
+    int id ;
     Coordonnees coordonnees;
     Status status;
     int timeInStatus;
@@ -11,13 +12,22 @@ public class Individual {
     int dI;
     int dR;
 
-    public Individual(Coordonnees coordonnees, Status status, int dI, int dE, int dR) {
+    public Individual(int id, Coordonnees coordonnees, Status status, int dI, int dE, int dR) {
+        this.id = id ;
         this.coordonnees = coordonnees;
         this.status = status;
         this.timeInStatus = 0;
         this.dE = dE;
         this.dI = dI;
         this.dR = dR;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setStatus(Status status) {
