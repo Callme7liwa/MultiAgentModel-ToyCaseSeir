@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -110,9 +111,11 @@ public class MultiAgentServiceImpl implements MultiAgentService {
         }
     }
 
-
     // Méthode pour exécuter une itération de la simulation
-    public void simulate_iteration(int simulation,int iteration,String fileName) {
+    public void simulate_iteration(int simulation,int iteration,String fileName)
+    {
+        Collections.shuffle(individuals);
+
         // Déplacer tous les individus
         for (Individual individual : individuals) {
             deplacer(individual);
@@ -127,6 +130,7 @@ public class MultiAgentServiceImpl implements MultiAgentService {
         for (Individual individual : individuals) {
             individual.evoluer();
         }
+
         // Enregistrer les statistiques
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
             int totalExposed = 0;

@@ -3,8 +3,6 @@ package Services;
 import Models.Individual;
 
 public interface MultiAgentService {
-
-
     public void initialize_individuals();
     public void initialize_grid();
     public void deplacer(Individual individual);

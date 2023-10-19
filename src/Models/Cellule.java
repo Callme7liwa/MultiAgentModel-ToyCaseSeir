@@ -8,7 +8,6 @@ public class Cellule {
     int y ;
     List<Individual> individuals;
 
-
     public Cellule(int x, int y) {
         this.x = x;
         this.y = y;
