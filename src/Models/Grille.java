@@ -2,10 +2,6 @@ package Models;
 
 import Utils.Coordonnees;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public class Grille {
     int nombreColonne;
     int nombreLigne ;

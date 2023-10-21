@@ -2,7 +2,6 @@ package Models;
 
 import Utils.Coordonnees;
 
-
 public class Individual {
     int id ;
     Coordonnees coordonnees;

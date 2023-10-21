@@ -7,7 +7,6 @@ import Models.Status;
 import Utils.Coordonnees;
 import Utils.CustomRandom;
 import Utils.UtilsAttributs;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,16 +14,13 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class MultiAgentServiceImpl implements MultiAgentService {
 
     private  List<Individual> individuals;
     private  Grille grid;
     private  CustomRandom customRandom;
-    private  static MultiAgentServiceImpl  agentServiceImpl;
-    List<Coordonnees> emptySpaces = new ArrayList<>();
+    private  static final MultiAgentServiceImpl  agentServiceImpl = new MultiAgentServiceImpl();
 
     public MultiAgentServiceImpl(){
         this.individuals = new ArrayList<>();;
@@ -32,12 +28,10 @@ public class MultiAgentServiceImpl implements MultiAgentService {
     }
 
     public static MultiAgentServiceImpl getInstance(){
-        if(agentServiceImpl == null)
-            agentServiceImpl = new MultiAgentServiceImpl();
         return agentServiceImpl;
     }
 
-    // Initialiser les individus
+    // Initialiser les individus et les ajoutés dans List<Individual> individuals
     public void initialize_individuals() {
         for (int i = 0; i < UtilsAttributs.TOTAL_INDIVIDUALS; i++) {
             int x = customRandom.generateInt(UtilsAttributs.GRID_SIZE);
@@ -88,7 +82,6 @@ public class MultiAgentServiceImpl implements MultiAgentService {
         individual.setCoordonnees(new Coordonnees(newX,newY));
     }
 
-
     // Méthode pour gérer l'infection du voisinage
     public  void infecter_voisinage(Individual individual) {
         if (individual.getStatus() == Status.S) {
@@ -107,6 +100,20 @@ public class MultiAgentServiceImpl implements MultiAgentService {
             if ( customRandom.generateRandomDoubleValue() < probability) {
                 individual.setStatus(Status.E);
                 individual.setTimeInStatus(0);
+                grid.getCelluleByCoordinates(individual.getCoordonnees())
+                        .getIndividuals()
+                        .stream()
+                        .filter(individual1 -> individual1.getId() == individual.getId())
+                        .findFirst()
+                        .get()
+                        .setStatus(Status.E);
+                grid.getCelluleByCoordinates(individual.getCoordonnees())
+                        .getIndividuals()
+                        .stream()
+                        .filter(individual1 -> individual1.getId() == individual.getId())
+                        .findFirst()
+                        .get()
+                        .setTimeInStatus(0);
             }
         }
     }
@@ -128,6 +135,14 @@ public class MultiAgentServiceImpl implements MultiAgentService {
 
         // Mettre à jour l'état de chaque individu
         for (Individual individual : individuals) {
+            grid.getCelluleByCoordinates(individual.getCoordonnees())
+                    .getIndividuals()
+                    .stream()
+                    .filter(individual1 -> individual1.getId() == individual.getId())
+                    .findFirst()
+                    .get()
+                    .evoluer();
+
             individual.evoluer();
         }
 
@@ -160,7 +175,7 @@ public class MultiAgentServiceImpl implements MultiAgentService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for(int iteration=1 ; iteration< UtilsAttributs.TOTAL_ITERATIONS ; iteration++){
+        for(int iteration = 1 ; iteration < UtilsAttributs.TOTAL_ITERATIONS ; iteration++){
             System.out.println("iteration"+iteration);
             simulate_iteration(simulation , iteration,fileName);
         }
