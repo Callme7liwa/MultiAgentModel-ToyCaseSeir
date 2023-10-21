@@ -1,8 +1,7 @@
 package Utils;
 
 public class CustomRandom {
-
-    private static final MersenneTwister mersenneTwister = new MersenneTwister();
+    private static final MersenneTwister mersenneTwister = new MersenneTwister(UtilsAttributs.SEED);
 
     private static final CustomRandom instance = new CustomRandom();
 

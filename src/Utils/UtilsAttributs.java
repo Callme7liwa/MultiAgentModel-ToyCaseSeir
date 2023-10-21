@@ -10,4 +10,5 @@ public class UtilsAttributs {
     public static final int TOTAL_INDIVIDUALS = 20000;
     public static final int INITIAL_INFECTED = 20;
     public static final int TOTAL_ITERATIONS = 50;
+    public static final long SEED = 162537;
 }
