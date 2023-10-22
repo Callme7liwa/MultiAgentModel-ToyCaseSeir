@@ -11,7 +11,7 @@
 * MONJI Said
 * SEDDIKI Ayoub
 ## I-Objectif
-L’objectif est de développer un modèle multi-agent simple de propagation d'une maladie dans une population. 
+L’objectif principal du projet est de développer un modèle multi-agent simple de propagation d'une maladie dans une population. 
 ## II-Structure du projet
 Le projet contient principalement trois packages ``Models``, ``Services``, et ``utils``.
 ### 1-packages
@@ -37,3 +37,6 @@ Ce patron permet d'organiser une application en différentes couches, chaque cou
 
 La structure de projet a été conçue de manière a faciliter la maintenance toute en respectant le principe d'ouverture a l'extension et fermé a la modification.
 
+## III-Diagramme de classe
+
+![MultiAgentModel](https://github.com/Callme7liwa/MultiAgentModel-ToyCaseSeir/assets/118975773/6b266735-b6a2-45a6-90d4-b1c2f70cd70c)
