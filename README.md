@@ -11,7 +11,7 @@
 * MONJI Said
 * SEDDIKI Ayoub
 ## PRNG
-Le PRNG utilisé dans ce projet pour générer des nombres aléatoires est Mersenne Twister, l'un des générateurs de nombres pseudo-aléatoires les plus largement utilisés et respectés. Il se distingue par sa longue période de répétition, qui signifie qu'il génère un grand nombre de séquences de nombres avant de revenir à une séquence déjà produite.
+Le **PRNG** utilisé dans ce projet pour générer des nombres aléatoires est **Mersenne Twister**, l'un des générateurs de nombres pseudo-aléatoires les plus largement utilisés et respectés. Il se distingue par sa longue période de répétition, qui signifie qu'il génère un grand nombre de séquences de nombres avant de revenir à une séquence déjà produite.
 ## I-Objectif
 L’objectif principal du projet est de développer un modèle multi-agent simple de propagation d'une maladie dans une population. 
 ## II-Structure du projet
